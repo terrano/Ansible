@@ -1,0 +1,50 @@
+- name: NGINX | Installing NGINX repo rpm
+  yum:
+     name: http://nginx.org/packages/centos/7/noarch/RPMS/nginx-release-centos-7-0.el7.ngx.noarch.rpm
+                 
+- name: NGINX | Installing NGINX
+  yum:
+     name: nginx
+     state: latest
+
+- name: "PHP | Installing php"
+  with_items: 
+        - php.x86_64
+        - php-cli.x86_64
+        - php-fpm.x86_64
+        - php-intl.x86_64
+        - php-mysql.x86_64
+        - php-xml.x86_64
+          #- spawn-fcgi.x86_64
+        - make.x86_64 
+        - automake.noarch
+        - gcc.x86_64
+        - gcc-c++.x86_64
+        - wget
+  yum: "name={{ item }} state=present"
+
+- name: Copy nginx.conf
+  template: src=../files/nginx.conf dest=/etc/nginx/ owner=root group=root mode=0644
+
+  #- name: Copy and extract wordpress
+  #unarchive: 
+  #   src=../files/html.tar 
+  #   dest=/usr/share/nginx
+  #   owner=nginx 
+  #   group=nginx 
+  #   mode=0755
+
+- name: Copy phpinfo.php
+  template: src=../files/phpinfo.php dest=/usr/share/nginx/html owner=root group=root mode=0644
+  notify:
+  - Starting_PHP
+
+
+- name: Copy mysite.conf
+  template: src=../files/my_site.conf dest=/etc/nginx/conf.d/ owner=root group=root mode=0644
+  notify:
+  - Starting_NGINX
+
+    #- name: Restart PHP
+    #notify:
+    #- Starting_PHP

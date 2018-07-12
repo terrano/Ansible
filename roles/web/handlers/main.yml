@@ -1,0 +1,12 @@
+- name: Starting_NGINX
+  service: name=nginx state=restarted
+  notify: 
+  - Starting_PHP
+
+- name: Starting_PHP
+  service: name=php-fpm state=restarted
+  notify: 
+  - shell
+
+- name: "shell"
+  shell: echo hostname > tt
